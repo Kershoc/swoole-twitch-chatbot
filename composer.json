@@ -1,0 +1,8 @@
+{
+    "autoload": {
+        "psr-4": { "Bot\\": ["src/"] }
+    },
+    "require": {
+        "symfony/dotenv": "^5.0"
+    }
+}
