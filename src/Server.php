@@ -29,6 +29,8 @@ class Server
             'worker_num' => 1, // The number of worker processes
             'daemonize' => false, // Whether start as a daemon process
             'backlog' => 128, // TCP backlog connection number
+            'document_root' => 'public_html', // Static Documents for regular http requests
+            'enable_static_handler' => true, // Let Swoole handle static files.
         ));
 
         $this->server->on('start', [$this, 'onStart'] );
@@ -66,9 +68,12 @@ class Server
 
     public function onRequest($request, $response)
     {
-        // TODO: Find a different way to serve the static content, this is just for basic testing.
-        // Normal web request, serve up the overlay page
-        $response->end(file_get_contents('public_html/index.html'));
+        if ($request->server['request_uri'] === '/') {
+            $response->sendfile('public_html/index.html');
+            return;
+        }
+        // Blanket 404.  Using swooles default static handler to handle static files
+        $response->status(404);
     }
 
     public function chatEventBroadcaster()
@@ -101,7 +106,7 @@ class Server
             $warframeWorldStateData = json_decode($warframeWorldState->getBody(),true);
             $warframeWorldState->close();
             $anomaly = json_decode($warframeWorldStateData['Tmp'], true);
-            echo "Scanning Veil Proxima ... ".var_export(array_key_exists('sfn',$anomaly), true)."\n";
+            echo "[" . date('Y-m-d H:i:s') . "] Scanning Veil Proxima ... ".var_export(array_key_exists('sfn',$anomaly), true)."\n";
             if (!empty($anomaly) && array_key_exists('sfn', $anomaly)) {
                 $cli->push("PRIVMSG {$_ENV['TWITCH_ROOM']} :DANGER Will Tennoson! DANGER! Sentient Anomaly spotted in Veil Proxima!  Dispatch all available Railjack's to Investigate!");
             }
