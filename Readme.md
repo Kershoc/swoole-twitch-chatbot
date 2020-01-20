@@ -1,6 +1,6 @@
 # swoole-twitch-bot
 
-Quick POC to try using Swoole to create a twitch chatbot.
+Quick proof of concept to try using Swoole to create a twitch chatbot.
 
 Sets up a websocket server on port localhost:1337
 
@@ -19,7 +19,10 @@ It can also broadcast events to the overlay driver.
 ```bash
 pecl install swoole
 ```
-
+#### Install Dependencies
+```bash
+composer install
+```
 #### Usage
 ```bash
 php chatbot.php
@@ -27,5 +30,7 @@ php chatbot.php
 
 #### ToDo
 * Overlays - Right now the overlay page is a console.log debug stub
+* Proper EventBroadcaster for the overlays 
+* Proper TimedCommand system for running bot commands on a schedule
 * Write a decent readme
 * Abstract away the PoC coupled systems marked with TODOs
