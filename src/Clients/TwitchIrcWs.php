@@ -2,8 +2,6 @@
 
 namespace Bot\Clients;
 
-use Bot\MessageDispatcher;
-use Bot\MessageParser;
 use Swoole\Coroutine;
 use Swoole\Coroutine\Channel;
 use Swoole\Coroutine\http\Client as wsClient;
