@@ -1,20 +1,9 @@
 <html>
-<head></head>
-<body></body>
-<script>
-    const ws = new WebSocket('ws://127.0.0.1:1337/');
-
-    ws.onopen = function(event) {
-    };
-
-    ws.onerror = function(error) {
-        console.log('ERR: ', error);
-    };
-    ws.onclose = function() {
-        console.log('INFO: Socket Closed');
-    };
-    ws.onmessage = function(event) {
-        console.log('RECV: ', event.data);
-    };
-</script>
+<head>
+    <title>Overlay</title>
+    <link type="text/css" rel="stylesheet" href="css/index.css" />
+</head>
+<body>
+    <script type="text/javascript" src="js/index.js"></script>
+</body>
 </html>
