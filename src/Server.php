@@ -74,6 +74,7 @@ class Server
         }
         // Blanket 404.  Using swooles default static handler to handle static files
         $response->status(404);
+        $response->end();
     }
 
     public function chatEventBroadcaster()
