@@ -37,7 +37,7 @@ class Server
         $this->server->on('workerStart', [$this, 'onWorkerStart']);
         $this->server->on('message', [$this, 'onMessage']);
         $this->server->on('open', [$this, 'onOpen']);
-        $this->server->on('request', [$this, 'onRequest']); // To support reqular http requests as well.
+        $this->server->on('request', [$this, 'onRequest']); // To support regular http requests as well.
 
         $this->server->start();
     }
@@ -53,6 +53,7 @@ class Server
         $this->chat_client = new TwitchIrcWs($this->ChatListenerChannel);
         Coroutine::create([$this, 'chatEventBroadcaster']);
         Coroutine::create([$this, 'chatClientListener']);
+        Coroutine::create([$this, 'timedCommandRunner']);
     }
 
     public function onOpen(wsServer $svr, $request)
@@ -99,20 +100,6 @@ class Server
             \co::sleep(0.1);
         }
 
-        // TODO: abstract some sort of TimedCommand system and put it someplace better then here
-        $cli = $this->chat_client->client;
-        $warframeRailjackAnomolyTimer = $this->server->tick(60000, function () use ($cli) {
-            $warframeWorldState = new Client('content.warframe.com', 80);
-            $warframeWorldState->get('/dynamic/worldState.php');
-            $warframeWorldStateData = json_decode($warframeWorldState->getBody(),true);
-            $warframeWorldState->close();
-            $anomaly = json_decode($warframeWorldStateData['Tmp'], true);
-            echo "[" . date('Y-m-d H:i:s') . "] Scanning Veil Proxima ... ".var_export(array_key_exists('sfn',$anomaly), true)."\n";
-            if (!empty($anomaly) && array_key_exists('sfn', $anomaly)) {
-                $cli->push("PRIVMSG {$_ENV['TWITCH_ROOM']} :DANGER Will Tennoson! DANGER! Sentient Anomaly spotted in Veil Proxima!  Dispatch all available Railjack's to Investigate!");
-            }
-        });
-
         // TODO: This should be its own class and more robust
         $dispatcher = new MessageDispatcher($this->chat_client->client, $this->EventBroadcasterChannel);
         $message_parser = new MessageParser($dispatcher);
@@ -128,6 +115,22 @@ class Server
                 } else {
                     $message_parser->parse($data);
                 }
+            }
+        }
+    }
+
+    public function timedCommandRunner()
+    {
+        // wait for chat client come up.  Better way to do this??
+        while ( ! $this->chat_client->client instanceof Client) {
+            \co::sleep(0.1);
+        }
+        foreach (new \DirectoryIterator('src/Commands/Timed/') as $item) {
+            $class = 'Bot\\Commands\\Timed\\' . $item->getBasename('.php');
+            if (class_exists($class)) {
+                $timedCommand = new $class($this->chat_client->client);
+                $this->server->tick($timedCommand->repeatAfter, [$timedCommand, 'run']);
+                echo "[".date("Y-m-d H:i:s")."] {$class} Timer Started! {$timedCommand->repeatAfter}ms interval \n";
             }
         }
     }
