@@ -2,16 +2,21 @@
 
 namespace Bot\Handlers;
 
+use Bot\EventObject;
 use Bot\MessageObject;
 use Co\http\Client;
+use Swoole\Coroutine\Channel;
+
 
 class Privmsg implements HandlerInterface
 {
     private $cli;
+    private $eventBroadcastChannel;
 
-    public function __construct(Client $cli)
+    public function __construct(Client $cli, Channel $eventBroadcastChannel)
     {
         $this->cli = $cli;
+        $this->eventBroadcastChannel = $eventBroadcastChannel;
     }
 
     public function handle(MessageObject $message_object) :void
@@ -33,5 +38,9 @@ class Privmsg implements HandlerInterface
                 $cmd->run($message_object);
             }
         }
+
+        // Chat Message;Send to overlay
+        $event = new EventObject('chat', $message_object);
+        $this->eventBroadcastChannel->push($event);
     }
 }

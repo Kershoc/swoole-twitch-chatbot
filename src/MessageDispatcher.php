@@ -33,10 +33,9 @@ class MessageDispatcher
     }
     public function dispatch(MessageObject $message_object) :void
     {
-        $this->channel->push($message_object); // TODO:: This was for testing. We need to abstract the event broadcaster away.
         $command_class = "Bot\\Handlers\\" . ucwords(strtolower($message_object->command));
         if (class_exists( $command_class )) {
-            $handler = new $command_class($this->cli);
+            $handler = new $command_class($this->cli, $this->channel);
             $handler->handle($message_object);
         }
     }

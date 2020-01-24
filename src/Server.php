@@ -99,24 +99,8 @@ class Server
         while ( ! $this->chat_client->client instanceof Client) {
             \co::sleep(0.1);
         }
-
-        // TODO: This should be its own class and more robust
-        $dispatcher = new MessageDispatcher($this->chat_client->client, $this->EventBroadcasterChannel);
-        $message_parser = new MessageParser($dispatcher);
-        while (true) {
-            $data = $this->ChatListenerChannel->pop();
-            if ($data) {
-                $data = trim($data);
-                if(substr_count($data, "\n") > 0) {
-                    $data = explode("\n", $data);
-                    foreach ($data as $item) {
-                        $message_parser->parse($item);
-                    }
-                } else {
-                    $message_parser->parse($data);
-                }
-            }
-        }
+        $listener = new ChatListener($this->chat_client->client, $this->ChatListenerChannel, $this->EventBroadcasterChannel);
+        $listener->run();
     }
 
     public function timedCommandRunner()
