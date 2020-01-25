@@ -112,7 +112,7 @@ class Server
         foreach (new \DirectoryIterator('src/Commands/Timed/') as $item) {
             $class = 'Bot\\Commands\\Timed\\' . $item->getBasename('.php');
             if (class_exists($class)) {
-                $timedCommand = new $class($this->chat_client->client);
+                $timedCommand = new $class($this->chat_client->client, $this->EventBroadcasterChannel);
                 $this->server->tick($timedCommand->repeatAfter, [$timedCommand, 'run']);
                 echo "[".date("Y-m-d H:i:s")."] {$class} Timer Started! {$timedCommand->repeatAfter}ms interval \n";
             }

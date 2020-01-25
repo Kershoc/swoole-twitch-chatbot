@@ -4,7 +4,9 @@
 namespace Bot\Commands\Timed;
 
 
+use Bot\EventObject;
 use Swoole\Coroutine\http\Client;
+use Swoole\Coroutine\Channel;
 
 class WarframeAnomaly implements TimedCommandInterface
 {
@@ -21,9 +23,10 @@ class WarframeAnomaly implements TimedCommandInterface
         555 => 'R-9 Cloud',
     ];
 
-    public function __construct(Client $cli)
+    public function __construct(Client $cli, Channel $broadcaster)
     {
         $this->client = $cli;
+        $this->broadcaster = $broadcaster;
     }
 
     public function run() :void
@@ -41,6 +44,12 @@ class WarframeAnomaly implements TimedCommandInterface
             $this->client->push("PRIVMSG {$_ENV['TWITCH_ROOM']} :DANGER Will Tennoson! DANGER! Sentient Anomaly spotted in {$isUp}!  Dispatch all available Railjack's to Investigate!");
         }
         echo "[" . date('Y-m-d H:i:s') . "] Scanning Veil Proxima ... ".var_export($isUp, true)."\n";
+        $payload = [
+            'command' => 'WarframeAnomaly',
+            'status' => $isUp
+        ];
+        $event = new EventObject('popup', $payload);
+        $this->broadcaster->push($event);
 
     }
 

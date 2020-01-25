@@ -34,7 +34,7 @@ class Privmsg implements HandlerInterface
             }
             $command_class = "Bot\\Commands\\" . ucwords(strtolower($command) . "Command");
             if (class_exists( $command_class )) {
-                $cmd = new $command_class($this->cli);
+                $cmd = new $command_class($this->cli, $this->eventBroadcastChannel);
                 $cmd->run($message_object);
             }
         }
