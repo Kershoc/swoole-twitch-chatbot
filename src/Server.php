@@ -59,7 +59,7 @@ class Server
     public function onOpen(wsServer $svr, $request)
     {
         echo "New Connection \n";
-        $svr->push($request->fd, "Welcome to the Party!\n");
+        $svr->push($request->fd, '{"msg": "Welcome to the Party!"}');
     }
 
     public function onMessage(wsServer $svr, $frame)
