@@ -1,1 +1,10 @@
 /* */
+
+#overlay {display:block; width:1280px; height:720px; position:relative;}
+
+#warframe-anomaly {position:absolute; top:0; left:490px; width:300px;}
+#warframe-anomaly video{width:100%;}
+#warframe-anomaly p{position:absolute; top:142px; text-align:center; width:300px; color:darkred; background:black; font-weight:bold; font-family: "DejaVu Sans", sans-serif;}
+
+#chat-component {position:absolute; bottom:0; right:0; width:300px;}
+#chat-component .chat-item{margin:2px; border-radius:5px;}
