@@ -23,14 +23,22 @@ pecl install swoole
 ```bash
 composer install
 ```
+#### Configure
+Copy .env-default to .env and fill in the fields.  
+```
+TWITCH_OAUTH_PASS=oauth:...
+TWITCH_NICK=UserDisplayName
+TWITCH_ROOM="#room"
+```
+
 #### Usage
 ```bash
 php chatbot.php
 ```
 
-#### ToDo
-* Overlays - Right now the overlay page is a console.log debug stub
-* Proper EventBroadcaster for the overlays 
-* Proper TimedCommand system for running bot commands on a schedule
+#### ToDo 
 * Write a decent readme
 * Abstract away the PoC coupled systems marked with TODOs
+* Convert Vuejs PoC to a full Vuejs app
+* Fill in missing message parsing for irc chat
+ 
