@@ -1,4 +1,5 @@
 /* */
+body {background-color:#000;}
 
 #overlay {display:block; width:1280px; height:720px; position:relative;}
 

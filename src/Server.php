@@ -59,7 +59,7 @@ class Server
     public function onOpen(wsServer $svr, $request)
     {
         echo "New Connection \n";
-        $svr->push($request->fd, '{"msg": "Welcome to the Party!"}');
+        $svr->push($request->fd, '{"msg": "Greetings Starfighter! You have been recruited by the Star League to defend the frontier against Xur and the Ko-Dan armada."}');
     }
 
     public function onMessage(wsServer $svr, $frame)

@@ -23,6 +23,7 @@ class Privmsg implements HandlerInterface
     {
         // In a PRIVMSG the options are our chat message
         $message = trim($message_object->options, ": \t\n\r\0\x0B"); // Adding colon to trim list to get it off the front. We've got to trim the newline off the end, so might as well
+        $message_object->options = strip_tags($message);
 
         if ($message[0] === "!") {
             // Bot Command, see if we have one to match
