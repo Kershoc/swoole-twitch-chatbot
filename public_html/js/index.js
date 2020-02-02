@@ -14,6 +14,7 @@ const store = new Vuex.Store({
     mutations: {
         chat (state, payload) {
             state.chat.push(payload)
+            setTimeout(() => {state.chat.shift()}, 10000)
         },
         popup (state, payload) {
             state.popup.push(payload)

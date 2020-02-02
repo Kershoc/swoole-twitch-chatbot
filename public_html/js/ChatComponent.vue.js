@@ -2,10 +2,11 @@ export default {
     name: 'ChatComponent',
     template: `
         <div id="chat-component">
-        <transition-group name="fade">
+        <transition-group name="slide-fade">
             <div class="chat-item" v-for="(chat, index) in chats" v-bind:key="chat.tags.id" v-bind:style="{'background-color': chat.tags.color, 'color': fontColor(chat.tags.color)}" >
                 <div class="name">{{chat.tags['display-name']}}</div>
-                <p v-html="injectEmotes(chat)"></p>
+                <div class="avatar"><img :src="chat.user[0].profile_image_url" /></div>
+                <p class="message" v-html="injectEmotes(chat)"></p>
             </div>
         </transition-group>
         </div>`,
@@ -27,7 +28,7 @@ export default {
         injectEmotes(chatObj) {
             let emoteUrl = 'https://static-cdn.jtvnw.net/emoticons/v1/'
             if (chatObj.tags.emotes) {
-                let replacements = [];
+                let replacements = []
                 let emotes = chatObj.tags.emotes.split('/') // multiple unique emotes
                 emotes.forEach((uniqueEmote) => {
                     let emote = uniqueEmote.split(':')

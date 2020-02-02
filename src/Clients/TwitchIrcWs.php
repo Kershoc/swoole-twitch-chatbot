@@ -2,6 +2,7 @@
 
 namespace Bot\Clients;
 
+use Exception;
 use Swoole\Coroutine;
 use Swoole\Coroutine\Channel;
 use Swoole\Coroutine\http\Client as wsClient;
@@ -23,7 +24,7 @@ class TwitchIrcWs
         $cli = new wsClient("irc-ws.chat.twitch.tv", 443, true);
         $ret = $cli->upgrade("/");
         if (!$ret) {
-            throw new \Exception("Websocket Upgrade Failed", $cli->errCode);
+            throw new Exception("Websocket Upgrade Failed", $cli->errCode);
         }
         $this->client = $cli;
 
