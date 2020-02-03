@@ -27,6 +27,7 @@ composer install
 Copy .env-default to .env and fill in the fields.  
 ```
 TWITCH_OAUTH_PASS=oauth:...
+TWITCH_CLIENT_ID=...
 TWITCH_NICK=UserDisplayName
 TWITCH_ROOM="#room"
 ```
