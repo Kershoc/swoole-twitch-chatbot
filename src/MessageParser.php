@@ -12,13 +12,11 @@
  */
 namespace Bot;
 
-use Swoole\Coroutine\http\Client;
-
 class MessageParser
 {
     private $dispatcher;
 
-    public function __construct($dispatcher)
+    public function __construct(MessageDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
