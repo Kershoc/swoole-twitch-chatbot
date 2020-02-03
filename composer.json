@@ -3,6 +3,7 @@
         "psr-4": { "Bot\\": ["src/"] }
     },
     "require": {
-        "symfony/dotenv": "^5.0"
+        "symfony/dotenv": "^5.0",
+        "ext-json": "*"
     }
 }
