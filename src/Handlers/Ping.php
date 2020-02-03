@@ -3,7 +3,7 @@
 namespace Bot\Handlers;
 
 use Bot\MessageObject;
-use Co\http\Client;
+use Swoole\Coroutine\http\Client;
 
 class Ping implements HandlerInterface
 {
@@ -14,7 +14,7 @@ class Ping implements HandlerInterface
         $this->cli = $cli;
     }
 
-    public function handle(MessageObject $messageObject) :void
+    public function handle(MessageObject $messageObject): void
     {
         echo "> PONG :tmi.twitch.tv \n";
         $this->cli->push('PONG :tmi.twitch.tv');

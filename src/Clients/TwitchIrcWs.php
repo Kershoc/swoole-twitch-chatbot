@@ -28,7 +28,7 @@ class TwitchIrcWs
         }
         $this->client = $cli;
 
-        while(true) {
+        while (true) {
             $data = $cli->recv()->data;
             if ($data) {
                 $this->channel->push($data);

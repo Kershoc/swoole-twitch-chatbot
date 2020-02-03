@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Parse the twitch chat message
  * See: http://www.hydrogen18.com/blog/parsing-twitch-chat-to-build-a-bot.html
@@ -11,7 +12,7 @@
  */
 namespace Bot;
 
-use Co\http\Client;
+use Swoole\Coroutine\http\Client;
 
 class MessageParser
 {
@@ -22,9 +23,9 @@ class MessageParser
         $this->dispatcher = $dispatcher;
     }
 
-    public function parse($data) :void
+    public function parse($data): void
     {
-        echo "[".date('Y-m-d H:i:s', time())."] " . $data . "\n";
+        echo "[" . date('Y-m-d H:i:s', time()) . "] " . $data . "\n";
 
         $tags = [];
         $irc_user = null;
@@ -37,7 +38,7 @@ class MessageParser
             $rawtags = substr($data, 1, $first_space);
             $rawtags = explode(';', $rawtags);
             foreach ($rawtags as $tag) {
-                $pair = explode('=',$tag);
+                $pair = explode('=', $tag);
                 $tags[$pair[0]] = $pair[1];
             }
             // Remove tags from Payload
@@ -78,6 +79,5 @@ class MessageParser
         $message_object = new MessageObject($command, $command_options, $tags, $irc_user, $irc_room);
 
         $this->dispatcher->dispatch($message_object);
-
     }
 }

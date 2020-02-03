@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Bot\Commands\Timed;
-
 
 use Bot\EventObject;
 use Swoole\Coroutine\http\Client;
@@ -29,11 +27,11 @@ class WarframeAnomaly implements TimedCommandInterface
         $this->broadcaster = $broadcaster;
     }
 
-    public function run() :void
+    public function run(): void
     {
         $warframeWorldState = new Client('content.warframe.com', 80);
         $warframeWorldState->get('/dynamic/worldState.php');
-        $warframeWorldStateData = json_decode($warframeWorldState->getBody(),true);
+        $warframeWorldStateData = json_decode($warframeWorldState->getBody(), true);
         $warframeWorldState->close();
 
         $anomaly = json_decode($warframeWorldStateData['Tmp'], true);
@@ -43,14 +41,12 @@ class WarframeAnomaly implements TimedCommandInterface
             $isUp = $this->zones[$anomaly['sfn']];
             $this->client->push("PRIVMSG {$_ENV['TWITCH_ROOM']} :DANGER Will Tennoson! DANGER! Sentient Anomaly spotted in {$isUp}!  Dispatch all available Railjack's to Investigate!");
         }
-        echo "[" . date('Y-m-d H:i:s') . "] Scanning Veil Proxima ... ".var_export($isUp, true)."\n";
+        echo "[" . date('Y-m-d H:i:s') . "] Scanning Veil Proxima ... " . var_export($isUp, true) . "\n";
         $payload = [
             'command' => 'WarframeAnomaly',
             'status' => $isUp
         ];
         $event = new EventObject('popup', $payload);
         $this->broadcaster->push($event);
-
     }
-
 }

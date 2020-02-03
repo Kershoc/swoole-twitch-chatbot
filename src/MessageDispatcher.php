@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Start of message dispatcher.  Takes a parsed message object.
  * Determines what to do with it based on Command Received.
@@ -11,13 +12,13 @@ namespace Bot;
 use Swoole\Coroutine\http\Client;
 use Swoole\Coroutine\Channel;
 
-
 class MessageDispatcher
 {
     private $cli;
     private $channel;
 
-    public function __construct(Client $cli, Channel $channel) {
+    public function __construct(Client $cli, Channel $channel)
+    {
         $this->cli = $cli;
         $this->channel = $channel;
 
@@ -29,12 +30,12 @@ class MessageDispatcher
         $this->cli->push("CAP REQ :twitch.tv/membership");
         $this->cli->push("CAP REQ :twitch.tv/tags");
         $this->cli->push("JOIN {$_ENV['TWITCH_ROOM']}");
-
     }
-    public function dispatch(MessageObject $message_object) :void
+
+    public function dispatch(MessageObject $message_object): void
     {
         $command_class = "Bot\\Handlers\\" . ucwords(strtolower($message_object->command));
-        if (class_exists( $command_class )) {
+        if (class_exists($command_class)) {
             $handler = new $command_class($this->cli, $this->channel);
             $handler->handle($message_object);
         }

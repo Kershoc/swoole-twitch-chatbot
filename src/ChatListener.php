@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Bot;
 
 use Swoole\Coroutine\http\Client;
@@ -29,7 +28,7 @@ class ChatListener
             $data = $this->chatChannel->pop();
             if ($data) {
                 $data = trim($data);
-                if(substr_count($data, "\n") > 0) {
+                if (substr_count($data, "\n") > 0) {
                     $data = explode("\n", $data);
                     foreach ($data as $item) {
                         $this->parser->parse($item);
@@ -39,7 +38,5 @@ class ChatListener
                 }
             }
         }
-
     }
-
 }

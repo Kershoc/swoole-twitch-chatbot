@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Generic for now.
  * TODO: Validation of content; special getters; immutable;

@@ -3,7 +3,7 @@
 namespace Bot\Commands;
 
 use Bot\MessageObject;
-use Co\http\Client;
+use Swoole\Coroutine\http\Client;
 
 class ListCommand implements CommandInterface
 {
@@ -14,10 +14,8 @@ class ListCommand implements CommandInterface
         $this->cli = $cli;
     }
 
-    public function run(MessageObject $message_object) :void
+    public function run(MessageObject $message_object): void
     {
         $this->cli->push("PRIVMSG {$message_object->irc_room} :Available commands are !speak and !dice");
     }
-
-
 }

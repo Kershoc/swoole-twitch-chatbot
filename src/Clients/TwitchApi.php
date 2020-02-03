@@ -5,7 +5,6 @@
 
 namespace Bot\Clients;
 
-
 class TwitchApi
 {
     private $endpointUrl = 'https://api.twitch.tv/helix/';
@@ -19,9 +18,9 @@ class TwitchApi
     public function getUserById($userId)
     {
         $opts = array(
-            'http'=>array(
-                'method'=>"GET",
-                'header'=>"Client-ID: ".$this->clientId."\r\n"
+            'http' => array(
+                'method' => "GET",
+                'header' => "Client-ID: " . $this->clientId . "\r\n"
             )
         );
         $context = stream_context_create($opts);
