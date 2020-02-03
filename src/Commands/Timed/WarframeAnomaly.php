@@ -10,6 +10,7 @@ class WarframeAnomaly implements TimedCommandInterface
 {
     public $repeatAfter = 60000;
     private $client;
+    private $broadcaster;
     private $zones = [
         505 => 'Ruse War Field',
         510 => 'Gian Point',
@@ -39,7 +40,8 @@ class WarframeAnomaly implements TimedCommandInterface
         $isUp = false;
         if (is_array($anomaly) && array_key_exists('sfn', $anomaly)) {
             $isUp = $this->zones[$anomaly['sfn']];
-            $this->client->push("PRIVMSG {$_ENV['TWITCH_ROOM']} :DANGER Will Tennoson! DANGER! Sentient Anomaly spotted in {$isUp}!  Dispatch all available Railjack's to Investigate!");
+            $this->client->push("PRIVMSG {$_ENV['TWITCH_ROOM']} :DANGER Will Tennoson! DANGER! Sentient Anomaly "
+             . "spotted in {$isUp}!  Dispatch all available Railjack's to Investigate!");
         }
         echo "[" . date('Y-m-d H:i:s') . "] Scanning Veil Proxima ... " . var_export($isUp, true) . "\n";
         $payload = [
