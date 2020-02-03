@@ -23,5 +23,4 @@ class MessageObject
         $this->irc_user = $irc_user;
         $this->irc_room = $irc_room;
     }
-
 }

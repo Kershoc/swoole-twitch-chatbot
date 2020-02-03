@@ -40,6 +40,4 @@ class D20Command implements CommandInterface
         $eventObj = new EventObject('popup', $payload);
         $this->broadcaster->push($eventObj);
     }
-
-
 }

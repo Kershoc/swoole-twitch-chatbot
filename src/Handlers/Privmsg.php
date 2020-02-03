@@ -22,7 +22,8 @@ class Privmsg implements HandlerInterface
     public function handle(MessageObject $message_object): void
     {
         // In a PRIVMSG the options are our chat message
-        $message = trim($message_object->options, ": \t\n\r\0\x0B"); // Adding colon to trim list to get it off the front. We've got to trim the newline off the end, so might as well
+        //Adding colon to trim list to get it off the front. We've got to trim the newline off the end, so might as well
+        $message = trim($message_object->options, ": \t\n\r\0\x0B");
         $message_object->options = $message; // TODO: Properly Sanitize content
 
         if ($message[0] === "!") {

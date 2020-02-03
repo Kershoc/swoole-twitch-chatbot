@@ -14,5 +14,4 @@ class EventObject
         $this->event = $event;
         $this->payload = $payload;
     }
-
 }
