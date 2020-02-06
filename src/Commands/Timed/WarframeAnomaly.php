@@ -30,10 +30,7 @@ class WarframeAnomaly implements TimedCommandInterface
 
     public function run(): void
     {
-        $warframeWorldState = new Client('content.warframe.com', 80);
-        $warframeWorldState->get('/dynamic/worldState.php');
-        $warframeWorldStateData = json_decode($warframeWorldState->getBody(), true);
-        $warframeWorldState->close();
+        $warframeWorldStateData = $this->getWorldState();
 
         $anomaly = json_decode($warframeWorldStateData['Tmp'], true);
 
@@ -50,5 +47,17 @@ class WarframeAnomaly implements TimedCommandInterface
         ];
         $event = new EventObject('popup', $payload);
         $this->broadcaster->push($event);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function getWorldState()
+    {
+        $warframeWorldState = new Client('content.warframe.com', 80);
+        $warframeWorldState->get('/dynamic/worldState.php');
+        $warframeWorldStateData = json_decode($warframeWorldState->getBody(), true);
+        $warframeWorldState->close();
+        return $warframeWorldStateData;
     }
 }

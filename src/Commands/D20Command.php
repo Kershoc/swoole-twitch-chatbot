@@ -20,7 +20,7 @@ class D20Command implements CommandInterface
 
     public function run(MessageObject $message_object): void
     {
-        $num = rand(1, 20);
+        $num = $this->rollDie();
         if ($num === 20) {
             $this->cli->push("PRIVMSG {$message_object->irc_room} :" .
                              $message_object->tags['display-name'] . ' CRITS! ' . $num);
@@ -39,5 +39,10 @@ class D20Command implements CommandInterface
             ];
         $eventObj = new EventObject('popup', $payload);
         $this->broadcaster->push($eventObj);
+    }
+
+    public function rollDie()
+    {
+        return rand(1, 20);
     }
 }
