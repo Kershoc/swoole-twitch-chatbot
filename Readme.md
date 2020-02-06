@@ -31,6 +31,7 @@ TWITCH_CLIENT_ID=...
 TWITCH_NICK=UserDisplayName
 TWITCH_ROOM="#room"
 ```
+If you are interested in running the tests, you will want to also make a .env.testing file with dummy data inside.
 
 #### Usage
 ```bash
