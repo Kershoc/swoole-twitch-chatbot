@@ -29,18 +29,21 @@ class Privmsg implements HandlerInterface
         if ($message[0] === "!") {
             // Bot Command, see if we have one to match
             $command = $this->parseCommand($message);
-            $command_class = "Bot\\Commands\\" . ucwords(strtolower($command) . "Command");
-            if (class_exists($command_class)) {
-                $cmd = new $command_class($this->cli, $this->eventBroadcastChannel);
-                $cmd->run($message_object);
+            if ($this->botCommandExists($command)) {
+                $this->runBotCommand($command, $message_object);
             }
         }
 
         // TODO: This doesn't belong here.  Move it.
-        if ($message_object->tags['user-id']) {
+        if (
+            property_exists($message_object, 'tags')
+            && is_array($message_object->tags)
+            && array_key_exists('user-id', $message_object)
+        ) {
             $twitchApi = new TwitchApi();
             $message_object->user = $twitchApi->getUserById($message_object->tags['user-id']);
         }
+
         // Chat Message;Send to overlay
         $event = new EventObject('chat', $message_object);
         $this->eventBroadcastChannel->push($event);
@@ -55,5 +58,26 @@ class Privmsg implements HandlerInterface
             $command = substr($message, 1);
         }
         return $command;
+    }
+
+    public function botCommandClass(string $command): string
+    {
+        return "Bot\\Commands\\" . ucwords(strtolower($command) . "Command");
+    }
+
+    public function botCommandExists($command): bool
+    {
+        $commandClass = $this->botCommandClass($command);
+        if (class_exists($commandClass)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function runBotCommand(string $command, MessageObject $messageObject)
+    {
+        $commandClass = $this->botCommandClass($command);
+        $cmd = new $commandClass($this->cli, $this->eventBroadcastChannel);
+        $cmd->run($messageObject);
     }
 }
