@@ -28,12 +28,7 @@ class Privmsg implements HandlerInterface
 
         if ($message[0] === "!") {
             // Bot Command, see if we have one to match
-            $has_args = strpos($message, " ");
-            if ($has_args !== false) {
-                $command = substr($message, 1, $has_args - 1);
-            } else {
-                $command = substr($message, 1);
-            }
+            $command = $this->parseCommand($message);
             $command_class = "Bot\\Commands\\" . ucwords(strtolower($command) . "Command");
             if (class_exists($command_class)) {
                 $cmd = new $command_class($this->cli, $this->eventBroadcastChannel);
@@ -41,6 +36,7 @@ class Privmsg implements HandlerInterface
             }
         }
 
+        // TODO: This doesn't belong here.  Move it.
         if ($message_object->tags['user-id']) {
             $twitchApi = new TwitchApi();
             $message_object->user = $twitchApi->getUserById($message_object->tags['user-id']);
@@ -48,5 +44,16 @@ class Privmsg implements HandlerInterface
         // Chat Message;Send to overlay
         $event = new EventObject('chat', $message_object);
         $this->eventBroadcastChannel->push($event);
+    }
+
+    public function parseCommand(string $message): string
+    {
+        $has_args = strpos($message, " ");
+        if ($has_args !== false) {
+            $command = substr($message, 1, $has_args - 1);
+        } else {
+            $command = substr($message, 1);
+        }
+        return $command;
     }
 }
