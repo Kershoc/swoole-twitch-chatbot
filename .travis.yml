@@ -6,7 +6,7 @@ php:
   - '7.4'
 before_install:
   - travis_retry composer self-update
-  - pecl install swoole
+  - yes | pecl install swoole
   - composer install
 script:
   - cp .env-default .env.testing
