@@ -1,4 +1,5 @@
 # swoole-twitch-bot
+[![Build Status](https://travis-ci.org/Kershoc/swoole-twitch-chatbot.svg?branch=dev)](https://travis-ci.org/Kershoc/swoole-twitch-chatbot)
 
 Quick proof of concept to try using Swoole to create a twitch chatbot.
 
