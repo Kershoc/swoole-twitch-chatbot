@@ -12,7 +12,7 @@ It can also broadcast events to the overlay driver.
 
 #### Requirements
 
-* php 7.1+ CLI 
+* php 7.2+ CLI 
 * Swoole 4
 
 #### Install Swoole
