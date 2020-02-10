@@ -2,12 +2,18 @@
 
 namespace Bot;
 
-use Bot\MessageParser;
 use PHPUnit\Framework\TestCase;
 
 class MessageParserTest extends TestCase
 {
     private $parser;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setOutputCallback(function () {
+        });
+    }
 
     public function setUp(): void
     {
