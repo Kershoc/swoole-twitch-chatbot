@@ -19,7 +19,7 @@ class ChatListener
         $this->eventChannel = $broadcastChannel;
         $this->chatChannel = $listenChannel;
         $this->dispatcher = new MessageDispatcher($this->chatClient, $this->eventChannel);
-        $this->parser = new MessageParser($this->dispatcher);
+        $this->parser = new MessageParser();
     }
 
     public function run()
@@ -31,10 +31,12 @@ class ChatListener
                 if (substr_count($data, "\n") > 0) {
                     $data = explode("\n", $data);
                     foreach ($data as $item) {
-                        $this->parser->parse($item);
+                        $msgObj = $this->parser->parse($item);
+                        $this->dispatcher->dispatch($msgObj);
                     }
                 } else {
-                    $this->parser->parse($data);
+                    $msgObj = $this->parser->parse($data);
+                    $this->dispatcher->dispatch($msgObj);
                 }
             }
         }

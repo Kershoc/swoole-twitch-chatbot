@@ -14,68 +14,80 @@ namespace Bot;
 
 class MessageParser
 {
-    private $dispatcher;
+    private $tags = [];
+    private $ircUser = null;
+    private $ircCommand;
+    private $ircRoom = null;
 
-    public function __construct(MessageDispatcher $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function parse($data): void
+    public function parse($data): MessageObject
     {
         echo "[" . date('Y-m-d H:i:s', time()) . "] " . $data . "\n";
 
-        $tags = [];
-        $irc_user = null;
-        $irc_room = null;
-
         // Check if we have tags
-        if ($data[0] === '@') {
-            // Tags Payload
-            $first_space = strpos($data, ' ');
-            $rawtags = substr($data, 1, $first_space);
-            $rawtags = explode(';', $rawtags);
-            foreach ($rawtags as $tag) {
-                $pair = explode('=', $tag);
-                $tags[$pair[0]] = $pair[1];
-            }
-            // Remove tags from Payload
-            $data = substr($data, ++$first_space);
+        if ('@' === substr($data, 0, 1)) {
+            $data = $this->parseTags($data);
         }
 
         // Either IRCUser or Command is next.  Check for colon;
-        if ($data[0] === ':') {
-            $first_space = strpos($data, ' ');
-            $irc_user = substr($data, 0, $first_space);
-            // Remove irc user from payload
-            $data = substr($data, ++$first_space);
+        if (':' === substr($data, 0, 1)) {
+            $data = $this->parseIrcUser($data);
         }
 
         // At this point we should have a command at the beginning of our payload.
-        $first_space = strpos($data, ' ');
-        $command = substr($data, 0, $first_space);
-        // Remove command from payload
-        $data = substr($data, ++$first_space);
+        $data = $this->parseIrcCommand($data);
 
         // Next Comes Room
-        if ($data[0] === '#') {
-            $first_space = strpos($data, ' ');
-            if ($first_space === false) {
-                // No more spaces, just room is left;
-                $irc_room = $data;
-                $data = ''; // Empty the string
-            } else {
-                $irc_room = substr($data, 0, $first_space);
-                // Remove irc room from payload
-                $data = substr($data, ++$first_space);
-            }
+        if ('#' === substr($data, 0, 1)) {
+            $data = $this->parseIrcRoom($data);
         }
 
         // What's left are the command options / message
         $command_options = $data;
 
-        $message_object = new MessageObject($command, $command_options, $tags, $irc_user, $irc_room);
+        return new MessageObject($this->ircCommand, $command_options, $this->tags, $this->ircUser, $this->ircRoom);
+    }
 
-        $this->dispatcher->dispatch($message_object);
+    private function parseTags(string $message): string
+    {
+        // Tags Payload
+        $first_space = strpos($message, ' ');
+        $rawTags = substr($message, 1, $first_space - 1);
+        $rawTags = explode(';', $rawTags);
+        foreach ($rawTags as $tag) {
+            $pair = explode('=', $tag);
+            $this->tags[$pair[0]] = $pair[1];
+        }
+        // Remove tags from Payload
+        return substr($message, ++$first_space);
+    }
+
+    private function parseIrcUser(string $message): string
+    {
+        $first_space = strpos($message, ' ');
+        $this->ircUser = substr($message, 0, $first_space);
+        // Remove irc user from payload
+        return substr($message, ++$first_space);
+    }
+
+    private function parseIrcCommand(string $message): string
+    {
+        $first_space = strpos($message, ' ');
+        $this->ircCommand = substr($message, 0, $first_space);
+        // Remove command from payload
+        return substr($message, ++$first_space);
+    }
+
+    private function parseIrcRoom(string $message): string
+    {
+        $first_space = strpos($message, ' ');
+        if ($first_space === false) {
+            // No more spaces, just room is left;
+            $this->ircRoom = $message;
+            return '';
+        } else {
+            $this->ircRoom = substr($message, 0, $first_space);
+            // Remove irc room from payload
+            return substr($message, ++$first_space);
+        }
     }
 }
