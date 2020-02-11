@@ -1,7 +1,9 @@
 <?php
 
-namespace Bot;
+namespace Bot\Server;
 
+use Bot\MessageDispatcher;
+use Bot\MessageParser;
 use Swoole\Coroutine\http\Client;
 use Swoole\Coroutine\Channel;
 

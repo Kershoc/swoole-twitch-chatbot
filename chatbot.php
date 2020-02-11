@@ -8,4 +8,5 @@ use Bot\Server;
 $dotenv = new Dotenv();
 $dotenv->load(__DIR__ . '/.env');
 
-new Server();
+$bot = new Server();
+$bot->server->start();

@@ -10,7 +10,9 @@
 
 namespace Bot;
 
-use DirectoryIterator;
+use Bot\Server\ChatEventBroadcaster;
+use Bot\Server\TimedCommandRunner;
+use Bot\Server\ChatListener;
 use Bot\Clients\TwitchIrcWs;
 use Swoole\Coroutine\http\Client;
 use Swoole\Coroutine\Channel;
@@ -35,17 +37,10 @@ class Server
             'enable_static_handler' => true, // Let Swoole handle static files.
         ));
 
-        $this->server->on('start', [$this, 'onStart']);
         $this->server->on('workerStart', [$this, 'onWorkerStart']);
         $this->server->on('message', [$this, 'onMessage']);
         $this->server->on('open', [$this, 'onOpen']);
         $this->server->on('request', [$this, 'onRequest']); // To support regular http requests as well.
-
-        $this->server->start();
-    }
-
-    public function onStart()
-    {
     }
 
     public function onWorkerStart()
@@ -53,21 +48,38 @@ class Server
         $this->EventBroadcasterChannel = new Channel();
         $this->ChatListenerChannel = new Channel();
         $this->chat_client = new TwitchIrcWs($this->ChatListenerChannel);
-        Coroutine::create([$this, 'chatEventBroadcaster']);
-        Coroutine::create([$this, 'chatClientListener']);
-        Coroutine::create([$this, 'timedCommandRunner']);
+        // wait for chat client come up.  Better way to do this??
+        while (! $this->chat_client->client instanceof Client) {
+            Coroutine::sleep(0.1);
+        }
+
+        $chatEventBroadcaster = new ChatEventBroadcaster(
+            $this->server,
+            $this->EventBroadcasterChannel
+        );
+        $chatClientListener = new ChatListener(
+            $this->chat_client->client,
+            $this->ChatListenerChannel,
+            $this->EventBroadcasterChannel
+        );
+        $timedCommandRunner = new TimedCommandRunner(
+            $this->server,
+            $this->chat_client->client,
+            $this->EventBroadcasterChannel
+        );
+        Coroutine::create([$chatEventBroadcaster, 'run']);
+        Coroutine::create([$chatClientListener, 'run']);
+        Coroutine::create([$timedCommandRunner, 'run']);
     }
 
     public function onOpen(wsServer $svr, $request)
     {
-        echo "New Connection \n";
         $svr->push($request->fd, '{"msg": "Greetings Starfighter! You have been recruited by the Star League 
 to defend the frontier against Xur and the Ko-Dan armada."}');
     }
 
     public function onMessage(wsServer $svr, $frame)
     {
-        $svr->push($frame->fd, "Sup!\n");
     }
 
     public function onRequest($request, $response)
@@ -79,50 +91,5 @@ to defend the frontier against Xur and the Ko-Dan armada."}');
         // Blanket 404.  Using swooles default static handler to handle static files
         $response->status(404);
         $response->end();
-    }
-
-    public function chatEventBroadcaster()
-    {
-        // TODO: This should be it own class and more robust
-        while (true) {
-            $data = $this->EventBroadcasterChannel->pop();
-            if ($data) {
-                foreach ($this->server->connections as $fd) {
-                    if ($this->server->isEstablished($fd)) {
-                        $this->server->push($fd, json_encode($data));
-                    }
-                }
-            }
-        }
-    }
-
-    public function chatClientListener()
-    {
-        // wait for chat client come up.  Better way to do this??
-        while (! $this->chat_client->client instanceof Client) {
-            Coroutine::sleep(0.1);
-        }
-        $listener = new ChatListener(
-            $this->chat_client->client,
-            $this->ChatListenerChannel,
-            $this->EventBroadcasterChannel
-        );
-        $listener->run();
-    }
-
-    public function timedCommandRunner()
-    {
-        // wait for chat client come up.  Better way to do this??
-        while (! $this->chat_client->client instanceof Client) {
-            Coroutine::sleep(0.1);
-        }
-        foreach (new DirectoryIterator('src/Commands/Timed/') as $item) {
-            $class = 'Bot\\Commands\\Timed\\' . $item->getBasename('.php');
-            if (class_exists($class)) {
-                $timedCommand = new $class($this->chat_client->client, $this->EventBroadcasterChannel);
-                $this->server->tick($timedCommand->repeatAfter, [$timedCommand, 'run']);
-                echo "[" . date("Y-m-d H:i:s") . "] {$class} Timer Started! {$timedCommand->repeatAfter}ms interval \n";
-            }
-        }
     }
 }
