@@ -14,7 +14,6 @@ use Bot\Server\ChatEventBroadcaster;
 use Bot\Server\TimedCommandRunner;
 use Bot\Server\ChatListener;
 use Bot\Clients\TwitchIrcWs;
-use Swoole\Coroutine\http\Client;
 use Swoole\Coroutine\Channel;
 use Swoole\Coroutine;
 use Swoole\Websocket\Server as wsServer;
@@ -22,7 +21,7 @@ use Swoole\Websocket\Server as wsServer;
 class Server
 {
     public $server;
-    public $chat_client;
+    public $chatClient;
     public $EventBroadcasterChannel;
     public $ChatListenerChannel;
 
@@ -47,24 +46,21 @@ class Server
     {
         $this->EventBroadcasterChannel = new Channel();
         $this->ChatListenerChannel = new Channel();
-        $this->chat_client = new TwitchIrcWs($this->ChatListenerChannel);
-        // wait for chat client come up.  Better way to do this??
-        while (! $this->chat_client->client instanceof Client) {
-            Coroutine::sleep(0.1);
-        }
-
+        $chatClient = new TwitchIrcWs($this->ChatListenerChannel);
+        $this->chatClient = $chatClient->start();
+        $chatClient->login();
         $chatEventBroadcaster = new ChatEventBroadcaster(
             $this->server,
             $this->EventBroadcasterChannel
         );
         $chatClientListener = new ChatListener(
-            $this->chat_client->client,
+            $this->chatClient,
             $this->ChatListenerChannel,
             $this->EventBroadcasterChannel
         );
         $timedCommandRunner = new TimedCommandRunner(
             $this->server,
-            $this->chat_client->client,
+            $this->chatClient,
             $this->EventBroadcasterChannel
         );
         Coroutine::create([$chatEventBroadcaster, 'run']);

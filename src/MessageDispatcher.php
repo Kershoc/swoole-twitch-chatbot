@@ -21,15 +21,6 @@ class MessageDispatcher
     {
         $this->cli = $cli;
         $this->channel = $channel;
-
-        // Putting the initial connection stuff here for now.
-        // Should be somewhere else though.
-        $this->cli->push("PASS {$_ENV['TWITCH_OAUTH_PASS']}");
-        $this->cli->push("NICK {$_ENV['TWITCH_NICK']}");
-        $this->cli->push("CAP REQ :twitch.tv/commands");
-        $this->cli->push("CAP REQ :twitch.tv/membership");
-        $this->cli->push("CAP REQ :twitch.tv/tags");
-        $this->cli->push("JOIN {$_ENV['TWITCH_ROOM']}");
     }
 
     public function dispatch(MessageObject $message_object): void
