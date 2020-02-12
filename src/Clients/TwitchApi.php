@@ -5,27 +5,33 @@
 
 namespace Bot\Clients;
 
+use Swoole\Coroutine\http\Client;
+
 class TwitchApi
 {
-    private $endpointUrl = 'https://api.twitch.tv/helix/';
+    private $endpointPath = '/helix/';
+    private $endpointHost = 'api.twitch.tv';
     private $clientId = '';
+    private $client;
 
     public function __construct()
     {
         $this->clientId = $_ENV['TWITCH_CLIENT_ID'];
     }
 
+    public function connect(): self
+    {
+        $client = new Client($this->endpointHost, 443, true);
+        $client->setHeaders(['Client-ID' => $this->clientId]);
+        $this->client = $client;
+        return $this;
+    }
+
     public function getUserById($userId)
     {
-        $opts = array(
-            'http' => array(
-                'method' => "GET",
-                'header' => "Client-ID: " . $this->clientId . "\r\n"
-            )
-        );
-        $context = stream_context_create($opts);
-        $url = $this->endpointUrl . 'users?id=' . $userId;
-        $data = json_decode(file_get_contents($url, false, $context), true);
+        $url = $this->endpointPath . 'users?id=' . $userId;
+        $this->client->get($url);
+        $data = json_decode($this->client->body, true);
         return $data['data'];
     }
 }

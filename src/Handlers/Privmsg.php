@@ -41,7 +41,7 @@ class Privmsg implements HandlerInterface
             && array_key_exists('user-id', $message_object->tags)
         ) {
             $twitchApi = new TwitchApi();
-            $message_object->user = $twitchApi->getUserById($message_object->tags['user-id']);
+            $message_object->user = $twitchApi->connect()->getUserById($message_object->tags['user-id']);
         }
 
         // Chat Message;Send to overlay
